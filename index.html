@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>ЗАПАСКА СЕРВИС</title>
+    <!-- Подключение манифеста для блокировки белых вспышек операционной системы телефона -->
+  <link rel="manifest" href="manifest.json">
+
 
   <!-- Полная интеграция под автономное мобильное приложение -->
   <meta name="theme-color" content="#060606">
@@ -21,7 +24,9 @@
       background: #060606; 
       background-image: radial-gradient(circle at center, #161616 0%, #060606 100%);
       display: flex; flex-direction: column; justify-content: center; align-items: center;
-      z-index: 9999999; opacity: 1; transition: opacity 0.7s cubic-bezier(0.215, 0.610, 0.355, 1), visibility 0.7s;
+      z-index: 9999999; opacity: 1; 
+      /* Увеличили плавность растворения до 0.9 сек */
+      transition: opacity 0.9s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.9s;
     }
     .splash-screen.fade-out { opacity: 0; visibility: hidden; }
     
@@ -67,6 +72,16 @@
     .loader-bar-progress { position: absolute; height: 100%; background: #faad14; width: 0; animation: loadProgress 2s forwards cubic-bezier(0.22, 1, 0.36, 1); box-shadow: 0 0 15px #faad14, 0 0 5px #ffffff; }
     .loader-caption { font-size: 11px; font-weight: 800; color: #3a3a3a; text-transform: uppercase; letter-spacing: 2px; margin-top: 12px; }
 
+    /* ЭФФЕКТ ПЛАВНОГО НАРАСТАНИЯ ДЛЯ КЛИЕНТСКОГО ПРИЛОЖЕНИЯ */
+    .app-frame {
+      position: fixed; top:0; left:0; bottom:0; right:0; 
+      width:100%; height:100%; border:none; margin:0; padding:0; 
+      overflow:hidden; z-index:99999;
+      opacity: 0; /* Изначально полностью скрываем, чтобы не моргал белый фон */
+      transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .app-frame.visible { opacity: 1; }
+
     /* КАРДИНАЛЬНО УЛУЧШЕННЫЕ АНИМАЦИИ СВЕЧЕНИЯ И ВХОДА */
     @keyframes neonPulse {
       0%, 100% { 
@@ -87,20 +102,14 @@
 
   <!-- МАКСИМАЛЬНО СОЛИДНЫЙ ЭКРАН ЗАСТАВКИ -->
   <div id="splash" class="splash-screen">
-    <!-- Реалистичный SVG-логотип автомобильного колеса с протекторами и тормозным диском -->
     <svg class="splash-logo" viewBox="0 0 24 24" fill="none" xmlns="http://w3.org">
-      <!-- Наружная шина и мощный агрессивный протектор -->
       <circle cx="12" cy="12" r="10.5" stroke="#faad14" stroke-width="1.2" stroke-dasharray="1 1.5"/>
       <circle cx="12" cy="12" r="9.5" stroke="#faad14" stroke-width="0.8"/>
       <circle cx="12" cy="12" r="8.2" stroke="#faad14" stroke-width="1.8"/>
-      <!-- Внутренний перфорированный тормозной диск -->
       <circle cx="12" cy="12" r="5" stroke="#faad14" stroke-width="0.5" stroke-dasharray="0.5 0.8"/>
-      <!-- Центральная ступица -->
       <circle cx="12" cy="12" r="2.2" stroke="#faad14" stroke-width="2"/>
       <circle cx="12" cy="12" r="0.6" fill="#ffffff"/>
-      <!-- Массивные литые спицы диска -->
       <path d="M12 2V6M12 18V22M2 12H6M18 12H22M4.93 4.93L7.8 7.8M16.2 16.2L19.07 19.07M19.07 4.93L16.2 7.8M7.8 16.2L4.93 19.07" stroke="#faad14" stroke-width="1.6" stroke-linecap="round"/>
-      <!-- Дополнительные ребра жесткости диска -->
       <path d="M12 3.8V5.2M12 18.8V20.2M3.8 12H5.2M18.8 12H20.2" stroke="#ffffff" stroke-width="0.8"/>
     </svg>
     
@@ -113,19 +122,22 @@
     </div>
   </div>
 
-  <!-- ОНЛАЙН-ПРИЛОЖЕНИЕ (РАБОТАЕТ НА ФОНЕ) -->
-  <iframe src="https://script.google.com/macros/s/AKfycbwSwFwLJibkUW3XzZeWvqhL-AEq-Ze1WD20SNj2WIfVXzj_AW_RGN4eR16Er1ZKXpSKEw/exec" 
-          style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:99999;">
-  </iframe>
+  <!-- ОНЛАЙН-ПРИЛОЖЕНИЕ С КЛАССОМ ПЛАВНОГО ПОЯВЛЕНИЯ -->
+  <iframe id="appFrame" class="app-frame" src="ВСТАВЬТЕ_СЮДА_ВАШУ_РАБОЧУЮ_ПРЯМУЮ_ССЫЛКУ_GOOGLE_EXEC"></iframe>
 
   <script>
-    // Увеличили время показа до 2.2 секунд, чтобы анимация набора прогресс-бара прошла полностью, а свечение раскрылось во всей красе
+    // Запускаем переключение экранов через 2 секунды (когда прогресс-бар добежал до конца)
     setTimeout(function() {
       var splash = document.getElementById('splash');
+      var frame = document.getElementById('appFrame');
+      
       if (splash) {
-        splash.classList.add('fade-out');
+        splash.classList.add('fade-out'); // Плавно гасим неоновую заставку
       }
-    }, 2200);
+      if (frame) {
+        frame.classList.add('visible'); // Одновременно и плавно проявляем само приложение
+      }
+    }, 2000);
   </script>
 
 </body>
